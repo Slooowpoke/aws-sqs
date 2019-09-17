@@ -27,7 +27,6 @@ const getDefaults = ({ defaults, accountId, arn }) => {
 const getQueue = async ({ sqs, queueUrl }) => {
   let queueAttributes = {}
   try {
-    console.log('Hi!');
     const response = await sqs.getQueueAttributes({ QueueUrl: queueUrl }).promise()
     queueAttributes = response.Attributes
   } catch (error) {

@@ -28,23 +28,24 @@ const defaults = {
 
 class AwsSqsQueue extends Component {
   async default(inputs = {}) {
-
+    const config = mergeDeepRight(getDefaults({ defaults }), inputs)
     const accountId = await getAccountId(aws)
+    
     const arn = getArn({
       aws,
       accountId,
-      name: inputs.name || defaults.name,
-      region: inputs.region || defaults.region
+      name: config.name,
+      region: config.region
     })
     
     const queueUrl = getUrl({
       aws,
       accountId,
-      name: inputs.name || defaults.name,
-      region: inputs.region || defaults.region
+      name: config.name,
+      region: config.region
     })
     
-    const config = mergeDeepRight(getDefaults({ accountId, arn, defaults }), inputs)
+    
     config.arn = arn
     config.url = queueUrl
 
@@ -55,7 +56,7 @@ class AwsSqsQueue extends Component {
       credentials: this.context.credentials.aws
     })
 
-    const prevInstance = await getQueue({ sqs, queueUrl })
+    const prevInstance = await getQueue({ sqs, queueUrl: this.state.url || queueUrl })
     var queueAttributes = {};
 
     if (isEmpty(prevInstance)) {
@@ -92,7 +93,7 @@ class AwsSqsQueue extends Component {
     
     const accountId = await getAccountId(aws)
     
-    const queueUrl = getUrl({
+    const queueUrl = this.state.url || getUrl({
       aws,
       accountId,
       name: config.name,
