@@ -10,8 +10,7 @@ const {
   getArn,
   getUrl,
   getAttributes,
-  setAttributes,
-  updateAttributes
+  setAttributes
 } = require('./utils')
 
 const outputsList = ['arn', 'url']
@@ -44,8 +43,7 @@ class AwsSqsQueue extends Component {
       name: config.name,
       region: config.region
     })
-    
-    
+
     config.arn = arn
     config.url = queueUrl
 
@@ -57,7 +55,6 @@ class AwsSqsQueue extends Component {
     })
 
     const prevInstance = await getQueue({ sqs, queueUrl: this.state.url || queueUrl })
-    var queueAttributes = {};
 
     if (isEmpty(prevInstance)) {
       this.context.status(`Creating`)
@@ -66,11 +63,24 @@ class AwsSqsQueue extends Component {
         config: config
       })
     } else {
-      this.context.status(`Updating`)
-      await setAttributes(sqs, queueUrl, config)
-    }
+      if (this.state.url == queueUrl) {
+        this.context.status(`Updating`)
+        await setAttributes(sqs, queueUrl, config)
+      }else{
+        this.context.debug(`The QueueUrl has changed`)
+        
+        this.context.debug(`Deleting previous queue`)
 
-    this.state.policy = queueAttributes.Policy
+        await deleteQueue({ sqs, queueUrl: this.state.url })
+
+        this.context.debug(`Creating new queue`)
+        await createQueue({
+          sqs,
+          config: config
+        })
+      }
+
+    }
 
     this.state.name = config.name
     this.state.arn = config.arn

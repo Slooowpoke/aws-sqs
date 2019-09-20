@@ -52,7 +52,16 @@ const getArn = ({ name, region, accountId }) => {
 }
 
 const createQueue = async ({ sqs, config }) => {
-  const { QueueArn: arn } = await sqs.createQueue({ QueueName: config.name, Attributes : createAttributeMap(config) }).promise()
+  let params = { QueueName: config.name, Attributes : createAttributeMap(config) }
+  
+  if (config.fifoQueue) {
+    params.Attributes.FifoQueue = 'true'
+  }
+  
+  if (config.tags ) {
+    params.tags  = config.tags
+  }
+  const { QueueArn: arn } = await sqs.createQueue(params).promise()
   return { arn }
 }
 
@@ -74,20 +83,28 @@ const setAttributes = async (sqs, queueUrl, config) => {
 }
 
 const createAttributeMap = (config) => {
-  const attributeMap = {
+  let attributeMap = {
     VisibilityTimeout : config.visibilityTimeout.toString(),
     MaximumMessageSize : config.maximumMessageSize.toString(),
     MessageRetentionPeriod : config.messageRetentionPeriod.toString(),
     DelaySeconds : config.delaySeconds.toString(),
-    ReceiveMessageWaitTimeSeconds : config.receiveMessageWaitTimeSeconds.toString()
+    ReceiveMessageWaitTimeSeconds : config.receiveMessageWaitTimeSeconds.toString(),
+    RedrivePolicy : JSON.stringify(config.redrivePolicy) || '',
+    Policy : JSON.stringify(config.policy) || '',
+    KmsMasterKeyId : JSON.stringify(config.kmsMasterKeyId) || '',
+    KmsDataKeyReusePeriodSeconds : JSON.stringify(config.kmsDataKeyReusePeriodSeconds) || '300'
   }
+  
+  if (config.fifoQueue) (
+   attributeMap.ContentBasedDeduplication = JSON.stringify(config.contentBasedDeduplication) || 'false'
+  )
+  
   return attributeMap
 }
 
 
 const deleteQueue = async ({ sqs, queueUrl }) => {
   try {
-     console.log('queueUrl', queueUrl);
     await sqs.deleteQueue({ QueueUrl: queueUrl }).promise()
   } catch (error) {
     if (error.code !== 'AWS.SimpleQueueService.NonExistentQueue') {
@@ -105,6 +122,5 @@ module.exports = {
   getDefaults,
   getQueue,
   getAttributes,
-  setAttributes,
-  updateAttributes
+  setAttributes
 }
