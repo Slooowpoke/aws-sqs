@@ -1,5 +1,5 @@
 const aws = require('aws-sdk')
-const { isEmpty, isNil, mergeDeepRight, pick } = require('ramda')
+const { isEmpty, mergeDeepRight, pick } = require('ramda')
 const { Component } = require('@serverless/core')
 const {
   createQueue,
@@ -9,7 +9,6 @@ const {
   getAccountId,
   getArn,
   getUrl,
-  getAttributes,
   setAttributes
 } = require('./utils')
 
@@ -29,14 +28,14 @@ class AwsSqsQueue extends Component {
   async default(inputs = {}) {
     const config = mergeDeepRight(getDefaults({ defaults }), inputs)
     const accountId = await getAccountId(aws)
-    
+
     const arn = getArn({
       aws,
       accountId,
       name: config.name,
       region: config.region
     })
-    
+
     const queueUrl = getUrl({
       aws,
       accountId,
@@ -63,12 +62,12 @@ class AwsSqsQueue extends Component {
         config: config
       })
     } else {
-      if (this.state.url == queueUrl) {
+      if (this.state.url === queueUrl) {
         this.context.status(`Updating`)
         await setAttributes(sqs, queueUrl, config)
-      }else{
+      } else {
         this.context.debug(`The QueueUrl has changed`)
-        
+
         this.context.debug(`Deleting previous queue`)
 
         await deleteQueue({ sqs, queueUrl: this.state.url })
@@ -79,7 +78,6 @@ class AwsSqsQueue extends Component {
           config: config
         })
       }
-
     }
 
     this.state.name = config.name
@@ -92,7 +90,6 @@ class AwsSqsQueue extends Component {
   }
 
   async remove(inputs = {}) {
-
     const config = mergeDeepRight(defaults, inputs)
     config.name = inputs.name || this.state.name || defaults.name
 
@@ -100,16 +97,17 @@ class AwsSqsQueue extends Component {
       region: config.region,
       credentials: this.context.credentials.aws
     })
-    
+
     const accountId = await getAccountId(aws)
-    
-    const queueUrl = this.state.url || getUrl({
-      aws,
-      accountId,
-      name: config.name,
-      region: config.region
-    })
-    
+
+    const queueUrl =
+      this.state.url ||
+      getUrl({
+        aws,
+        accountId,
+        name: config.name,
+        region: config.region
+      })
 
     this.context.status(`Removing`)
 
