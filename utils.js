@@ -34,21 +34,21 @@ const getArn = ({ name, region, accountId }) => {
 }
 
 const createAttributeMap = (config) => {
-  const attributeMap = {
-    VisibilityTimeout: config.visibilityTimeout.toString(),
-    MaximumMessageSize: config.maximumMessageSize.toString(),
-    MessageRetentionPeriod: config.messageRetentionPeriod.toString(),
-    DelaySeconds: config.delaySeconds.toString(),
-    ReceiveMessageWaitTimeSeconds: config.receiveMessageWaitTimeSeconds.toString(),
-    RedrivePolicy: JSON.stringify(config.redrivePolicy) || '',
-    Policy: JSON.stringify(config.policy) || '',
-    KmsMasterKeyId: JSON.stringify(config.kmsMasterKeyId) || '',
-    KmsDataKeyReusePeriodSeconds: JSON.stringify(config.kmsDataKeyReusePeriodSeconds) || '300'
-  }
+  const attributeMap = {}
+  if (typeof config.visibilityTimeout !== "undefined") attributeMap.MapVisibilityTimeout = config.visibilityTimeout.toString()
+  if (typeof config.maximumMessageSize !== "undefined") attributeMap.MaximumMessageSize = config.maximumMessageSize.toString()
+  if (typeof config.messageRetentionPeriod !== "undefined") attributeMap.MessageRetentionPeriod = config.messageRetentionPeriod.toString()
+  if (typeof config.delaySeconds !== "undefined") attributeMap.DelaySeconds = config.delaySeconds.toString()
+  if (typeof config.receiveMessageWaitTimeSeconds !== "undefined") attributeMap.ReceiveMessageWaitTimeSeconds = config.receiveMessageWaitTimeSeconds.toString()
+  if (typeof config.redrivePolicy !== "undefined") attributeMap.RedrivePolicy = JSON.stringify(config.redrivePolicy) || ''
+  if (typeof config.policy !== "undefined") attributeMap.Policy = JSON.stringify(config.policy) || ''
+  if (typeof config.kmsMasterKeyId !== "undefined") attributeMap.KmsMasterKeyId = JSON.stringify(config.kmsMasterKeyId) || ''
+  if (typeof config.kmsDataKeyReusePeriodSeconds !== "undefined") attributeMap.KmsDataKeyReusePeriodSeconds = JSON.stringify(config.kmsDataKeyReusePeriodSeconds) || '300'
 
   if (config.fifoQueue) {
-    attributeMap.ContentBasedDeduplication =
-      JSON.stringify(config.contentBasedDeduplication) || 'false'
+    if (typeof config.kmsDataKeyReusePeriodSeconds !== "undefined") {
+      attributeMap.ContentBasedDeduplication = JSON.stringify(config.contentBasedDeduplication) || 'false'
+    }
   }
 
   return attributeMap

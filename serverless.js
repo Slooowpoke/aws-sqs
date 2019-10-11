@@ -16,12 +16,7 @@ const outputsList = ['arn', 'url']
 
 const defaults = {
   name: 'serverless',
-  region: 'us-east-1',
-  visibilityTimeout: 30,
-  maximumMessageSize: 262144,
-  messageRetentionPeriod: 345600,
-  delaySeconds: 0,
-  receiveMessageWaitTimeSeconds: 0
+  region: 'us-east-1'
 }
 
 class AwsSqsQueue extends Component {
