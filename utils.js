@@ -35,7 +35,7 @@ const getArn = ({ name, region, accountId }) => {
 
 const createAttributeMap = (config) => {
   const attributeMap = {}
-  if (typeof config.visibilityTimeout !== "undefined") attributeMap.MapVisibilityTimeout = config.visibilityTimeout.toString()
+  if (typeof config.visibilityTimeout !== "undefined") attributeMap.VisibilityTimeout = config.visibilityTimeout.toString()
   if (typeof config.maximumMessageSize !== "undefined") attributeMap.MaximumMessageSize = config.maximumMessageSize.toString()
   if (typeof config.messageRetentionPeriod !== "undefined") attributeMap.MessageRetentionPeriod = config.messageRetentionPeriod.toString()
   if (typeof config.delaySeconds !== "undefined") attributeMap.DelaySeconds = config.delaySeconds.toString()
