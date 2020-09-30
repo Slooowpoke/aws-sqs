@@ -47,10 +47,10 @@ myQueue:
   component: '@serverless/aws-sqs'
   inputs:
     name: my-queue
-    visibilityTimeout: '30',
-    maximumMessageSize: '262144',
-    messageRetentionPeriod: '345600',
-    delaySeconds: '0',
+    visibilityTimeout: '30'
+    maximumMessageSize: '262144'
+    messageRetentionPeriod: '345600'
+    delaySeconds: '0'
     receiveMessageWaitTimeSeconds: '0' 
 ```
 
